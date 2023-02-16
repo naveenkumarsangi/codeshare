@@ -18,7 +18,7 @@ var storageClient *storage.Client
 var bucket *storage.BucketHandle
 
 func getFirebaseApp() (*firebase.App, error) {
-	opt := option.WithCredentialsFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+	opt := option.WithCredentialsFile(os.Getenv("FIREBASE_CREDS"))
 	app, err := firebase.NewApp(context.Background(), &firebase.Config{StorageBucket: "pastebin-personal.appspot.com"}, opt)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing app: %v", err)
