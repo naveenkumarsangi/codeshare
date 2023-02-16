@@ -5,7 +5,7 @@ WORKDIR /src
 COPY go.mod ./
 COPY go.sum ./
 
-RUN go mod tidy
+RUN go mod download
 
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/go-build \
