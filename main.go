@@ -44,7 +44,12 @@ func setupRouter() *gin.Engine {
 		if err := uploadFile(content, bucket, id.String()); err != nil {
 			c.String(http.StatusInternalServerError, fmt.Sprintf("unable to upload content, error: %s", err))
 		} else {
-			c.String(http.StatusOK, fmt.Sprintf("http://localhost:8080/s/%s", id))
+			scheme := "http"
+			if c.Request.TLS != nil {
+				scheme = "https"
+			}
+
+			c.String(http.StatusOK, fmt.Sprintf("%s://%s/s/%s", scheme, c.Request.Host, id))
 		}
 	})
 
