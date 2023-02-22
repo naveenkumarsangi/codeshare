@@ -1,0 +1,12 @@
+package handler
+
+import "testing"
+
+func TestVerifySignature(t *testing.T) {
+	content := "helloworld\n"
+	signature := "f6fwXjGHQulGLAq1LsaLWnLKTZ5HxkjvsmuoUdRzLPFQnwuD8pnj/vACHDd4hY6DxMG3+2HR9TZBn2xk5gnPCGB5aAwPmEoZ1QZmDPpGhg9Pc0tZhDq43MKciBK37/Yq+PeZHF8MiijUuoOcavJGJJDCizMEGcq0k9jreG2k120T9QUU06XuSY99I7TXYOvSLWbyDjCkhwn6NC/5or0bSOBWeSh49keH9OxF4fLI0NH6jYo3U3ddATSO2NAsdWoywLAGVl52JD1qhUdBGvhW4tC+v0ET2JwVxr6y6YqnEzKvDA2/6d9M45/aZqruToVXZYJXyzY6WwQNDXt2pD2cVCsmtIjFRP3ddklTlyPP35NIQsYvKq9Ff3hC8tlaQSix5iTJZ2NABArqa1pRHNWfRIEofJndB+3wtPkWCrgtlm0LMzd1FGA/w2bCdPfiyr3BMCqRkR57bJA+KhL4cXQomNE4UxrZHLu8A/Kae3ThCY8SnpTjlwxmbMHoeNabXobgHRbNZkGZFwgyf+BvtB0zrS5MrXowxvcLMrhbPY8sMTAut7yu2o27OS6DqLiFlEOkTEsqTfwGLtfFlEmN+hLkrqc2u86Z8y2k8ct31WjisMH7BNinbITzFAYNy0BKnf38P4qcsxxcJTGegHTqIfEuOtB0ndGrATspi+7VvRZou/w="
+
+	if err := verifySignature(content, signature); err != nil {
+		t.Error(err)
+	}
+}

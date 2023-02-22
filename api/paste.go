@@ -2,6 +2,10 @@ package handler
 
 import (
 	"context"
+	"crypto"
+	"crypto/rsa"
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -44,7 +48,30 @@ func uploadFile(data string, bucket *storage.BucketHandle, object string) error 
 	return nil
 }
 
+func verifySignature(content, encsig string) error {
+	sig, err := base64.StdEncoding.DecodeString(encsig)
+	if err != nil {
+		return err
+	}
+
+	msgHash := sha256.New()
+	_, err = msgHash.Write([]byte(content))
+	if err != nil {
+		return err
+	}
+	msgHashSum := msgHash.Sum(nil)
+
+	return rsa.VerifyPKCS1v15(pubSigningKey, crypto.SHA256, msgHashSum, sig)
+}
+
 func PasteHandler(w http.ResponseWriter, r *http.Request) {
+	sig := r.Header.Get("X-Api-Signature")
+	if sig == "" {
+		fmt.Fprintf(w, "missing signature")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	if err := r.ParseMultipartForm(10 * 1024 * 1024); err != nil {
 		fmt.Fprintf(w, "error: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -54,6 +81,12 @@ func PasteHandler(w http.ResponseWriter, r *http.Request) {
 	content := r.PostFormValue("content")
 	if content == "" {
 		fmt.Fprintf(w, "content in form is empty")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := verifySignature(content, sig); err != nil {
+		fmt.Fprintf(w, "crypto error: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
