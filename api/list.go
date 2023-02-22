@@ -16,16 +16,16 @@ type Error struct {
 }
 
 type File struct {
-	Name   string    `json:"name"`
-	Expiry time.Time `json:"expiry"`
+	Name        string    `json:"name"`
+	Size        int64     `json:"size"`
+	Created     time.Time `json:"created"`
+	ContentType string    `json:"contentType"`
 }
 
-func ListFilesHandler(w http.ResponseWriter, r *http.Request) {
+func getFileList() ([]File, error) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
-
-	w.Header().Set("Content-Type", "application/json")
 
 	q := &storage.Query{Prefix: ""}
 	it := bucket.Objects(ctx, q)
@@ -37,16 +37,26 @@ func ListFilesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err != nil {
-			e := Error{Error: err.Error()}
-			w.WriteHeader(http.StatusInternalServerError)
-			if err := json.NewEncoder(w).Encode(e); err != nil {
-				log.Fatal(err)
-			}
-			return
+			return nil, err
 		}
 
-		file := File{Name: attrs.Name, Expiry: attrs.RetentionExpirationTime}
+		file := File{Name: attrs.Name, Size: attrs.Size, Created: attrs.Created, ContentType: attrs.ContentType}
 		files = append(files, file)
+	}
+
+	return files, nil
+}
+
+func ListFilesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	files, err := getFileList()
+	if err != nil {
+		e := Error{Error: err.Error()}
+		w.WriteHeader(http.StatusInternalServerError)
+		if err := json.NewEncoder(w).Encode(e); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	if err := json.NewEncoder(w).Encode(files); err != nil {
