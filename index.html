@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <title>codeshare</title>
+</head>
+
+<body>
+  <style>
+    /* Sticky footer styles */
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+
+    body {
+      margin-bottom: 60px;
+      /* Margin bottom by footer height */
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 60px;
+      /* Set the fixed height of the footer here */
+      line-height: 60px;
+      /* Vertically center the text there */
+      background-color: #f5f5f5;
+    }
+
+    /* Custom page CSS
+        /* Not required for template or sticky footer method. */
+
+    .container {
+      width: auto;
+      max-width: 680px;
+      padding: 0 15px;
+    }
+  </style>
+  <div id="app">
+    <main role="main" class="container d-flex flex-column">
+      <h1 class="mt-5">Recently shared files</h1>
+      <p class="lead">These files are cleared out on a weekly basis and files won't be lying around here</p>
+      <lottie-player v-if="loading && !files" src="https://assets5.lottiefiles.com/packages/lf20_rkafct6f.json"
+        background="transparent" speed="1" style="width: 300px; height: 300px; align-self: center;" loop autoplay>
+      </lottie-player>
+      <table class="table" v-if="files && files.length > 0">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">File name</th>
+            <th scope="col">Size</th>
+            <th scope="col">Created</th>
+            <th scope="col">Content Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(f, idx) in files" :key="f.name">
+            <th scope="row">{{ idx }}</th>
+            <td><a :href="domain + '/api/share/?id=' + f.name">{{ f.name }}</a></th>
+            <td>{{ f.size }}</td>
+            <td>{{ f.created }}</td>
+            <td>{{ f.contentType }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">codeshare.naveenkumarsangi.me &copy; {{copyrightYear}} - All Rights Reserved.</span>
+      </div>
+    </footer>
+  </div>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+    integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+    crossorigin="anonymous"></script>
+
+  <script type="module">
+    import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+
+    createApp({
+      data() {
+        return {
+          message: 'Hello Vue!',
+          copyrightYear: (new Date()).getFullYear(),
+          files: [],
+          error: "",
+          loading: true,
+          domain: 'https://codeshare.naveenkumarsangi.me',
+        }
+      },
+      methods: {
+        async fetchData() {
+          try {
+            this.loading = true;
+            const response = await fetch(this.domain + "/api/list");
+            this.files = await response.json();
+          } catch (e) {
+            console.warn(e);
+            this.error = e;
+          } finally {
+            this.loading = false;
+          }
+        },
+      },
+      mounted() {
+        this.fetchData();
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>
