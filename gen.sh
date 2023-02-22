@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function file_exists() {
-    [ -f "$1" ] && echo "file already exists: $1" && exit 1
+	[ -f "$1" ] && echo "file already exists: $1" && exit 1
 }
 
 file_exists "$HOME/.ssh/codeshare.pem"
@@ -15,4 +15,3 @@ mv public.pem ~/.ssh/codeshare.public.pem
 
 echo "Please copy the following public key into api/index.go"
 cat ~/.ssh/codeshare.public.pem
-

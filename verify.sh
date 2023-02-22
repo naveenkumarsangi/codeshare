@@ -3,12 +3,12 @@
 TMPFILE="/tmp/codeshare.sign.sha256"
 
 function usage() {
-    echo "usage: $0 [SIGNATURE] [ORIGINAL_FILE]"
-    exit 1
+	echo "usage: $0 [SIGNATURE] [ORIGINAL_FILE]"
+	exit 1
 }
 
 if [ "$1" == "" ] || [ "$2" == "" ]; then
-    usage
+	usage
 fi
 
 openssl base64 -A -d -in "$1" -out /tmp/codeshare.sign.sha256
